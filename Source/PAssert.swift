@@ -13,10 +13,8 @@ public class PAssert {
     /**
         Setting at Xcode :
         ---------------------------------------
-        Build Settings
-            > Swift Compiler - Custom Flags
-                > Other Swift Flags
-                    > Debug    -D DEBUG
+        > Other Swift Flags > Debug  -D DEBUG
+    
 
         Usage :
         ---------------------------------------
