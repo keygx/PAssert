@@ -33,6 +33,8 @@ FUNC: viewDidLoad()
 
 ## Installation
 
+###CocoaPods
+
 * PodFile
 
 ```POdFile
@@ -50,8 +52,6 @@ $ pod install
 
 
 ## Usage
-
-###CocoaPods
 
 * Add DEBUG flag.
 
