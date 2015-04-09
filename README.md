@@ -2,12 +2,16 @@
 
 Power Assert for Swift
 
+* Source
+
 ```ViewController.sfift
 let num1 = 0
 let num2 = 10
 PAssert.assert(num1, >, num2) // false
 PAssert.assert(num2, ==, 10)  // true
 ```
+
+* Xcode Debug Area
 
 ```
 === Assertion Failed ===========================================================
