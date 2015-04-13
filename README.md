@@ -1,14 +1,14 @@
 # PAssert
 
-Power Assert for Swift
+Power Assert inspired debug tool in Swift
 
-* Source
+* ViewController.swift -> viewDidLoad()
 
 ```ViewController.sfift
-let num1 = 0
-let num2 = 10
-PAssert.assert(num1, >, num2) // false
-PAssert.assert(num2, ==, 10)  // true
+20: let num1 = 0
+21: let num2 = 10
+22: PAssert.assert(num1, >, num2) // false
+23: PAssert.assert(num2, ==, 10)  // true
 ```
 
 * Xcode Debug Area
