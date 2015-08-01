@@ -31,6 +31,10 @@ FUNC: viewDidLoad()
 [2015-04-09 17:02:04 ViewController.swift:23 viewDidLoad()] 10
 ```
 
+## Requirements
+- Swift 1.2
+- iOS 8.0 or later
+
 ## Installation
 
 ###CocoaPods
@@ -53,7 +57,9 @@ $ pod install
 
 ## Usage
 
-* Add DEBUG flag.
+###Add DEBUG flag.
+
+- installed by CocoaPods
 
 Pods > TARGETS > Pods-PAssert > Swift Compiler - Custom Flags > Other Swift Flags > Debug > -DDEBUG
 

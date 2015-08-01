@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = "PAssert"
-  s.version      = "0.1"
-  s.summary      = "Power Assert for Swift"
+  s.version      = "0.1.0"
+  s.summary      = "Power Assert inspired debug tool in Swift"
   s.homepage     = "https://github.com/keygx/PAssert"
   s.license      = { :type => "MIT", :file => "LICENSE" }
   s.author             = { "keygx" => "y.kagiyama@gmail.com" }
