@@ -103,11 +103,8 @@ extension XCTest {
                     if char == ")" {
                         ++endBracket
                     }
-                    if char == "," {
-                        ++comma
-                    }
                 }
-                if comma == 2 && (startBracket == endBracket) {
+                if startBracket == endBracket {
                     stop = true
                 }
                 literal += tmpLine
@@ -129,21 +126,25 @@ extension XCTest {
         return formatted
     }
     
-    // MARK: - get comma indexes
+    // MARK: - get line indexes
     private func getIndexes(literal: String) -> Array<Int> {
-        var indexes: Array<Int> = []
-        var i = 0
+        var location = 0
+        var length = 0
+        let pattern = ",(\\s*)[==|!=|>|<|>=|<=|===|!==|~=]+(\\s*),(\\s*)"
+        let regexp: NSRegularExpression? = NSRegularExpression(pattern: pattern, options: NSRegularExpressionOptions.allZeros, error: nil)
         
-        for char in literal {
-            if char == "(" {
-                if indexes.count == 0 {
-                    indexes.append(i)
-                }
-            } else if char == "," {
-                indexes.append(i)
-            }
-            ++i
+        if let regexp = regexp {
+            regexp.enumerateMatchesInString(literal, options: nil, range: NSMakeRange(0, count(literal)),
+                usingBlock: {(result: NSTextCheckingResult!, flags: NSMatchingFlags, stop: UnsafeMutablePointer<ObjCBool>) -> Void in
+                    location = result.range.location
+                    length = result.range.length
+            })
         }
+        
+        var indexes: Array<Int> = [0, 0, 0]
+        indexes[0] = count("=> ") + count("PAssert(")
+        indexes[1] = count("=> ") + location + 1
+        indexes[2] = indexes[1] + length - 1 - 2
         
         return indexes
     }
@@ -175,25 +176,21 @@ extension XCTest {
     // MARK: - print result
     private func output<T>(#source: String?, comparison: Bool, lhs: T, rhs: T, fileName: String, lineNumber: Int, function: String) -> String {
         
-        var out = ""
-        var literal = ""
-        if var src = source {
-            literal = getLiteral(src, lineNumber: lineNumber)
-        }
-        literal = "=> " + formattLiteral(literal)
-        
-        let indexes = getIndexes(literal)
-        
+        let title = "=== Assertion Failed ============================================="
         let file = "FILE: \(fileName)"
-        let title = "=== Assertion Failed ==========================================================="
         
-        out += "\n\n\(title)\n"
+        var out = "\n\n\(title)\n"
         out += "DATE: \(getDateTime())\n"
         out += "\(file)\n"
         out += "LINE: \(lineNumber)\n"
         out += "FUNC: \(function)\n"
         
-        if indexes.count == 3 {
+        if let src = source {
+            var literal = getLiteral(src, lineNumber: lineNumber) // return: PAssert(lhs, comparison, rhs)
+            
+            let indexes = getIndexes(literal)
+            
+            literal = "=> " + formattLiteral(literal)
             
             out += "\n"
             out += "\(literal)\n"
@@ -206,9 +203,9 @@ extension XCTest {
             rValue = (rValue == "") ? "\"\"" : rValue
             rValue = "\(rValue) [\(reflect(rhs).summary)]"
             
-            var space1 = repeatCharacter(" ", length: indexes[0] + 1)
+            var space1 = repeatCharacter(" ", length: indexes[0])
             var space2 = repeatCharacter(" ", length: indexes[1] - indexes[0])
-            var space3 = repeatCharacter(" ", length: indexes[2] - indexes[1] - 1)
+            var space3 = repeatCharacter(" ", length: indexes[2] - indexes[1])
             
             out += "\(space1)|\(space2)|\(space3)|\n"
             out += "\(space1)|\(space2)|\(space3)\(rValue)\n"
@@ -216,10 +213,10 @@ extension XCTest {
             out += "\(space1)|\(space2)\(comparison)\n"
             out += "\(space1)|\n"
             out += "\(space1)\(lValue)\n"
-            
+        
         } else {
             out += "\n"
-            out += "=> pa.assert(... \n///// Could not output /////\n"
+            out += "=> PAssert(...    ///// Could not output /////\n"
             out += "\n"
         }
         
