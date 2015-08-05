@@ -9,28 +9,6 @@ import Foundation
 import XCTest
 
 extension XCTest {
-
-    // MARK: - PAssert
-    func PAssert<T>(@autoclosure lhs: () -> T, _ comparison: (T, T) -> Bool, @autoclosure _ rhs: () -> T, filePath: String = __FILE__, lineNumber: Int = __LINE__, function: String = __FUNCTION__) {
-        
-        let result = comparison(lhs(), rhs())
-        
-        if !result {
-            var source = readSource(filePath)
-            
-            if source != "" {
-                source = removeComment(source)
-                source = removeMultilinesComment(source)
-                let out = output(source: source, comparison: result, lhs: lhs(), rhs: rhs(), fileName: getFilename(filePath), lineNumber: lineNumber, function: function)
-                
-                XCTFail(out, file: filePath, line:UInt(lineNumber))
-            }
-        } else {
-            println("")
-            println("[\(getDateTime()) \(getFilename(filePath)):\(lineNumber) \(function)] \(lhs())")
-            println("")
-        }
-    }
     
     // MARK: - get datetime
     private func getDateTime() -> String {
@@ -222,5 +200,30 @@ extension XCTest {
         
         return out
     }
+}
+
+// MARK: - PAssert
+func PAssert<T>(@autoclosure lhs: () -> T, comparison: (T, T) -> Bool, @autoclosure rhs: () -> T,
+                filePath: String = __FILE__, lineNumber: Int = __LINE__, function: String = __FUNCTION__) {
     
+    let test = XCTest()
+    
+    let result = comparison(lhs(), rhs())
+    
+    if !result {
+        var source = test.readSource(filePath)
+        
+        if source != "" {
+            source = test.removeComment(source)
+            source = test.removeMultilinesComment(source)
+            let out = test.output(source: source, comparison: result, lhs: lhs(), rhs: rhs(),
+                                  fileName: test.getFilename(filePath), lineNumber: lineNumber, function: function)
+            
+            XCTFail(out, file: filePath, line:UInt(lineNumber))
+        }
+    } else {
+        println("")
+        println("[\(test.getDateTime()) \(test.getFilename(filePath)):\(lineNumber) \(function)] \(lhs())")
+        println("")
+    }
 }
