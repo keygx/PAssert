@@ -197,11 +197,11 @@ extension XCTest {
             
             var lValue = "\(lhs)"
             lValue = (lValue == "") ? "\"\"" : lValue
-            lValue = "\(lValue) [\(reflect(lhs).summary)]"
+            lValue = "\(lValue)"
             
             var rValue = "\(rhs)"
             rValue = (rValue == "") ? "\"\"" : rValue
-            rValue = "\(rValue) [\(reflect(rhs).summary)]"
+            rValue = "\(rValue)"
             
             var space1 = repeatCharacter(" ", length: indexes[0])
             var space2 = repeatCharacter(" ", length: indexes[1] - indexes[0])

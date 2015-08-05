@@ -42,12 +42,12 @@ class PAssertSampleTests: XCTestCase {
     }
     
 }
+
 ```
 
 Test failure
 
 ```
-~~~~~~
 
 === Assertion Failed =============================================
 DATE: 2015-08-04 21:04:52
@@ -57,13 +57,11 @@ FUNC: testCalc()
 
 => PAssert(calc.add(3, 4), ==, 7)
            |               |   |
-           |               |   7 [7]
+           |               |   7
            |               |
            |               false
            |
-           12 [12]
-
-~~~~~~
+           12
 
 ```
 
