@@ -1,14 +1,39 @@
 //
-//  XCTest+PAssert.swift
+//  PAssert.swift
 //
-//  Created by keygx on 2015/08/01.
+//  Created by keygx on 2015/08/06.
 //  Copyright (c) 2015年 keygx. All rights reserved.
 //
 
-import Foundation
 import XCTest
 
-extension XCTest {
+// MARK: - PAssert
+public func PAssert<T>(@autoclosure lhs: () -> T, comparison: (T, T) -> Bool, @autoclosure rhs: () -> T,
+                filePath: String = __FILE__, lineNumber: Int = __LINE__, function: String = __FUNCTION__) {
+        
+        let pa = PAssertHelper()
+        
+        let result = comparison(lhs(), rhs())
+        
+        if !result {
+            var source = pa.readSource(filePath)
+            
+            if source != "" {
+                source = pa.removeComment(source)
+                source = pa.removeMultilinesComment(source)
+                let out = pa.output(source: source, comparison: result, lhs: lhs(), rhs: rhs(),
+                    fileName: pa.getFilename(filePath), lineNumber: lineNumber, function: function)
+                
+                XCTFail(out, file: filePath, line:UInt(lineNumber))
+            }
+        } else {
+            println("")
+            println("[\(pa.getDateTime()) \(pa.getFilename(filePath)):\(lineNumber) \(function)] \(lhs())")
+            println("")
+        }
+}
+
+private class PAssertHelper {
     
     // MARK: - get datetime
     private func getDateTime() -> String {
@@ -199,31 +224,5 @@ extension XCTest {
         }
         
         return out
-    }
-}
-
-// MARK: - PAssert
-func PAssert<T>(@autoclosure lhs: () -> T, comparison: (T, T) -> Bool, @autoclosure rhs: () -> T,
-                filePath: String = __FILE__, lineNumber: Int = __LINE__, function: String = __FUNCTION__) {
-    
-    let test = XCTest()
-    
-    let result = comparison(lhs(), rhs())
-    
-    if !result {
-        var source = test.readSource(filePath)
-        
-        if source != "" {
-            source = test.removeComment(source)
-            source = test.removeMultilinesComment(source)
-            let out = test.output(source: source, comparison: result, lhs: lhs(), rhs: rhs(),
-                                  fileName: test.getFilename(filePath), lineNumber: lineNumber, function: function)
-            
-            XCTFail(out, file: filePath, line:UInt(lineNumber))
-        }
-    } else {
-        println("")
-        println("[\(test.getDateTime()) \(test.getFilename(filePath)):\(lineNumber) \(function)] \(lhs())")
-        println("")
     }
 }

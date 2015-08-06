@@ -11,7 +11,7 @@ Power Assert inspired Test tool for XCTest by Swift
 
 ## Installation
 
-To integrate "XCTest+PAssert.swift" into your Xcode project Test Target
+To integrate "PAssert.swift" into your Xcode project Test Target
 
 ## Usage
 
