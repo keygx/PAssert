@@ -9,28 +9,28 @@ import XCTest
 
 // MARK: - PAssert
 public func PAssert<T>(@autoclosure lhs: () -> T, _ comparison: (T, T) -> Bool, @autoclosure _ rhs: () -> T,
-                filePath: String = __FILE__, lineNumber: Int = __LINE__, function: String = __FUNCTION__) {
+                       filePath: StaticString = #file, lineNumber: UInt = #line, function: String = #function) {
+    
+    let pa = PAssertHelper()
+    
+    let result = comparison(lhs(), rhs())
+
+    if !result {
+        var source = pa.readSource(filePath.stringValue)
         
-        let pa = PAssertHelper()
-        
-        let result = comparison(lhs(), rhs())
-        
-        if !result {
-            var source = pa.readSource(filePath)
+        if !source.isEmpty {
+            source = pa.removeComment(source)
+            source = pa.removeMultilinesComment(source)
+            let out = pa.output(source: source, comparison: result, lhs: lhs(), rhs: rhs(),
+                fileName: pa.getFilename(filePath.stringValue), lineNumber: lineNumber, function: function)
             
-            if !source.isEmpty {
-                source = pa.removeComment(source)
-                source = pa.removeMultilinesComment(source)
-                let out = pa.output(source: source, comparison: result, lhs: lhs(), rhs: rhs(),
-                    fileName: pa.getFilename(filePath), lineNumber: lineNumber, function: function)
-                
-                XCTFail(out, file: filePath, line:UInt(lineNumber))
-            }
-        } else {
-            print("")
-            print("[\(pa.getDateTime()) \(pa.getFilename(filePath)):\(lineNumber) \(function)] \(lhs())")
-            print("")
+            XCTFail(out, file: filePath, line:UInt(lineNumber))
         }
+    } else {
+        print("")
+        print("[\(pa.getDateTime()) \(pa.getFilename(filePath.stringValue)):\(lineNumber) \(function)] \(lhs())")
+        print("")
+    }
 }
 
 private class PAssertHelper {
@@ -84,10 +84,10 @@ private class PAssertHelper {
     }
     
     // MARK: - get literal
-    private func getLiteral(source: String, lineNumber: Int) -> String {
+    private func getLiteral(source: String, lineNumber: UInt) -> String {
         var tmpLine = ""
         var literal = ""
-        var lineIndex = 1
+        var lineIndex: UInt = 1
         var startBracket = 0
         var endBracket = 0
         
@@ -99,10 +99,10 @@ private class PAssertHelper {
                 
                 for char in tmpLine.characters {
                     if char == "(" {
-                        ++startBracket
+                        startBracket += 1
                     }
                     if char == ")" {
-                        ++endBracket
+                        endBracket += 1
                     }
                 }
                 if startBracket == endBracket {
@@ -182,7 +182,7 @@ private class PAssertHelper {
     }
     
     // MARK: - print result
-    private func output<T>(source source: String?, comparison: Bool, lhs: T, rhs: T, fileName: String, lineNumber: Int, function: String) -> String {
+    private func output<T>(source source: String?, comparison: Bool, lhs: T, rhs: T, fileName: String, lineNumber: UInt, function: String) -> String {
         
         let title = "=== Assertion Failed ============================================="
         let file = "FILE: \(fileName)"

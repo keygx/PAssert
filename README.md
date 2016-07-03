@@ -6,7 +6,7 @@ Power Assert inspired Test tool for XCTest by Swift
 
 
 ## Requirements
-- Swift 2.0
+- Swift 2.2
 - iOS 8.0 or later
 
 ## Installation
