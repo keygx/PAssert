@@ -21,7 +21,7 @@ public func PAssert<T>( _ lhs: @autoclosure() -> T, _ comparison: (T, T) -> Bool
         if !source.isEmpty {
             source = pa.removeComment(source)
             source = pa.removeMultilinesComment(source)
-            let out = pa.output(source: source, comparison: result, lhs: lhs(), rhs: rhs(),
+            let out = pa.output(source, comparison: result, lhs: lhs(), rhs: rhs(),
                 fileName: pa.getFilename(String(filePath)), lineNumber: lineNumber, function: function)
             
             XCTFail(out, file: filePath, line:UInt(lineNumber))
@@ -39,7 +39,7 @@ private class PAssertHelper {
     private func getDateTime() -> String {
         let now = Date()
         let dateFormatter = DateFormatter()
-        let localeIdentifier = Locale.current().localeIdentifier
+        let localeIdentifier = Locale.current.localeIdentifier
         dateFormatter.locale = Locale(localeIdentifier: localeIdentifier)
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
@@ -67,7 +67,7 @@ private class PAssertHelper {
         
         let pattern = "[ \t]*//.*"
         let replace = ""
-        formatted = source.replacingOccurrences(of: pattern, with: replace, options: NSString.CompareOptions.regularExpressionSearch, range: nil)
+        formatted = source.replacingOccurrences(of: pattern, with: replace, options: NSString.CompareOptions.regularExpression, range: nil)
         
         return formatted
     }
@@ -78,7 +78,7 @@ private class PAssertHelper {
         
         let pattern = "/\\*.*?\\*/"
         let replace = ""
-        formatted = source.replacingOccurrences(of: pattern, with: replace, options: NSString.CompareOptions.regularExpressionSearch, range: nil)
+        formatted = source.replacingOccurrences(of: pattern, with: replace, options: NSString.CompareOptions.regularExpression, range: nil)
         
         return formatted
     }
@@ -122,7 +122,7 @@ private class PAssertHelper {
         
         let pattern = "(,\\s*)"
         let replace = ", "
-        formatted = literal.replacingOccurrences(of: pattern, with: replace, options: NSString.CompareOptions.regularExpressionSearch, range: nil)
+        formatted = literal.replacingOccurrences(of: pattern, with: replace, options: NSString.CompareOptions.regularExpression, range: nil)
         
         return formatted
     }
@@ -161,7 +161,7 @@ private class PAssertHelper {
     private func getFilename(_ filePath: String) -> String {
         var fileName = ""
         
-        if let match = filePath.range(of: "[^/]*$", options: .regularExpressionSearch) {
+        if let match = filePath.range(of: "[^/]*$", options: .regularExpression) {
             fileName = filePath.substring(with: match)
         }
         
@@ -182,7 +182,7 @@ private class PAssertHelper {
     }
     
     // MARK: - print result
-    private func output<T>(source: String?, comparison: Bool, lhs: T, rhs: T, fileName: String, lineNumber: UInt, function: String) -> String {
+    private func output<T>(_ source: String?, comparison: Bool, lhs: T, rhs: T, fileName: String, lineNumber: UInt, function: String) -> String {
         
         let title = "=== Assertion Failed ============================================="
         let file = "FILE: \(fileName)"
