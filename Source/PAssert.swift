@@ -39,8 +39,8 @@ private class PAssertHelper {
     private func getDateTime() -> String {
         let now = Date()
         let dateFormatter = DateFormatter()
-        let localeIdentifier = Locale.current.localeIdentifier
-        dateFormatter.locale = Locale(localeIdentifier: localeIdentifier)
+        let localeIdentifier = Locale.current.identifier
+        dateFormatter.locale = Locale(identifier: localeIdentifier)
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
         return dateFormatter.string(from: now)
@@ -136,10 +136,10 @@ private class PAssertHelper {
         var indexes: Array<Int> = [0, 0, 0]
         
         do {
-            let regexp: RegularExpression = try RegularExpression(pattern: pattern, options: RegularExpression.Options())
+            let regexp: NSRegularExpression = try NSRegularExpression(pattern: pattern, options: NSRegularExpression.Options())
             
             regexp.enumerateMatches(in: literal, options: [], range: NSMakeRange(0, literal.characters.count),
-                using: {(result: TextCheckingResult?, flags: RegularExpression.MatchingFlags, stop: UnsafeMutablePointer<ObjCBool>) -> Void in
+                using: {(result: NSTextCheckingResult?, flags: NSRegularExpression.MatchingFlags, stop: UnsafeMutablePointer<ObjCBool>) -> Void in
                     if let result = result {
                         location = result.range.location
                         length = result.range.length
