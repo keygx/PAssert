@@ -16,27 +16,29 @@ public func PAssert<T>( _ lhs: @autoclosure() -> T, _ comparison: (T, T) -> Bool
     let result = comparison(lhs(), rhs())
 
     if !result {
-        var source = pa.readSource(String(filePath))
+        var source = pa.readSource(filePath.description)
         
         if !source.isEmpty {
             source = pa.removeComment(source)
             source = pa.removeMultilinesComment(source)
             let out = pa.output(source, comparison: result, lhs: lhs(), rhs: rhs(),
-                fileName: pa.getFilename(String(filePath)), lineNumber: lineNumber, function: function)
+                fileName: pa.getFilename(filePath.description), lineNumber: lineNumber, function: function)
             
             XCTFail(out, file: filePath, line:UInt(lineNumber))
         }
     } else {
         print("")
-        print("[\(pa.getDateTime()) \(pa.getFilename(String(filePath))):\(lineNumber) \(function)] \(lhs())")
+        print("[\(pa.getDateTime()) \(pa.getFilename(filePath.description)):\(lineNumber) \(function)] \(lhs())")
         print("")
     }
 }
 
 private class PAssertHelper {
     
+    init() {}
+    
     // MARK: - get datetime
-    private func getDateTime() -> String {
+    func getDateTime() -> String {
         let now = Date()
         let dateFormatter = DateFormatter()
         let localeIdentifier = Locale.current.identifier
@@ -47,7 +49,7 @@ private class PAssertHelper {
     }
     
     // MARK: - read source file
-    private func readSource(_ filePath: String) -> String {
+    func readSource(_ filePath: String) -> String {
         var source = ""
         
         do {
@@ -62,7 +64,7 @@ private class PAssertHelper {
     }
     
     // MARK: - remove comments
-    private func removeComment(_ source: String) -> String {
+    func removeComment(_ source: String) -> String {
         var formatted = ""
         
         let pattern = "[ \t]*//.*"
@@ -73,7 +75,7 @@ private class PAssertHelper {
     }
     
     // MARK: - remove multiline comments
-    private func removeMultilinesComment(_ source: String) -> String {
+    func removeMultilinesComment(_ source: String) -> String {
         var formatted = ""
         
         let pattern = "/\\*.*?\\*/"
@@ -84,7 +86,7 @@ private class PAssertHelper {
     }
     
     // MARK: - get literal
-    private func getLiteral(_ source: String, lineNumber: UInt) -> String {
+    func getLiteral(_ source: String, lineNumber: UInt) -> String {
         var tmpLine = ""
         var literal = ""
         var lineIndex: UInt = 1
@@ -117,7 +119,7 @@ private class PAssertHelper {
     }
     
     // MARK: - formatt literal
-    private func formattLiteral(_ literal: String) -> String {
+    func formattLiteral(_ literal: String) -> String {
         var formatted = ""
         
         let pattern = "(,\\s*)"
@@ -128,7 +130,7 @@ private class PAssertHelper {
     }
     
     // MARK: - get line indexes
-    private func getIndexes(_ literal: String) -> Array<Int> {
+    func getIndexes(_ literal: String) -> Array<Int> {
         var location = 0
         var length = 0
         let pattern = ",(\\s*)[==|!=|>|<|>=|<=|===|!==|~=]+(\\s*),(\\s*)"
@@ -158,7 +160,7 @@ private class PAssertHelper {
     }
     
     // MARK: - get file name
-    private func getFilename(_ filePath: String) -> String {
+    func getFilename(_ filePath: String) -> String {
         var fileName = ""
         
         if let match = filePath.range(of: "[^/]*$", options: .regularExpression) {
@@ -169,7 +171,7 @@ private class PAssertHelper {
     }
     
     // MARK: - repeat character
-    private func repeatCharacter(_ char: String, length: Int) -> String {
+    func repeatCharacter(_ char: String, length: Int) -> String {
         var chars = ""
         
         if length > 0 {
@@ -182,7 +184,7 @@ private class PAssertHelper {
     }
     
     // MARK: - print result
-    private func output<T>(_ source: String?, comparison: Bool, lhs: T, rhs: T, fileName: String, lineNumber: UInt, function: String) -> String {
+    func output<T>(_ source: String?, comparison: Bool, lhs: T, rhs: T, fileName: String, lineNumber: UInt, function: String) -> String {
         
         let title = "=== Assertion Failed ============================================="
         let file = "FILE: \(fileName)"
