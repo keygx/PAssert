@@ -8,7 +8,7 @@
 import XCTest
 
 // MARK: - PAssert
-public func PAssert<T>(@autoclosure lhs: () -> T, _ comparison: (T, T) -> Bool, @autoclosure _ rhs: () -> T,
+public func PAssert<T>( _ lhs: @autoclosure() -> T, _ comparison: (T, T) -> Bool, _ rhs: @autoclosure() -> T,
                        filePath: StaticString = #file, lineNumber: UInt = #line, function: String = #function) {
     
     let pa = PAssertHelper()
@@ -16,42 +16,44 @@ public func PAssert<T>(@autoclosure lhs: () -> T, _ comparison: (T, T) -> Bool, 
     let result = comparison(lhs(), rhs())
 
     if !result {
-        var source = pa.readSource(filePath.stringValue)
+        var source = pa.readSource(filePath.description)
         
         if !source.isEmpty {
             source = pa.removeComment(source)
             source = pa.removeMultilinesComment(source)
-            let out = pa.output(source: source, comparison: result, lhs: lhs(), rhs: rhs(),
-                fileName: pa.getFilename(filePath.stringValue), lineNumber: lineNumber, function: function)
+            let out = pa.output(source, comparison: result, lhs: lhs(), rhs: rhs(),
+                fileName: pa.getFilename(filePath.description), lineNumber: lineNumber, function: function)
             
             XCTFail(out, file: filePath, line:UInt(lineNumber))
         }
     } else {
         print("")
-        print("[\(pa.getDateTime()) \(pa.getFilename(filePath.stringValue)):\(lineNumber) \(function)] \(lhs())")
+        print("[\(pa.getDateTime()) \(pa.getFilename(filePath.description)):\(lineNumber) \(function)] \(lhs())")
         print("")
     }
 }
 
 private class PAssertHelper {
     
+    init() {}
+    
     // MARK: - get datetime
-    private func getDateTime() -> String {
-        let now = NSDate()
-        let dateFormatter = NSDateFormatter()
-        let localeIdentifier = NSLocale.currentLocale().localeIdentifier
-        dateFormatter.locale = NSLocale(localeIdentifier: localeIdentifier)
+    func getDateTime() -> String {
+        let now = Date()
+        let dateFormatter = DateFormatter()
+        let localeIdentifier = Locale.current.identifier
+        dateFormatter.locale = Locale(identifier: localeIdentifier)
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
-        return dateFormatter.stringFromDate(now)
+        return dateFormatter.string(from: now)
     }
     
     // MARK: - read source file
-    private func readSource(filePath: String) -> String {
+    func readSource(_ filePath: String) -> String {
         var source = ""
         
         do {
-            let code = try String(contentsOfFile:filePath, encoding: NSUTF8StringEncoding)
+            let code = try String(contentsOfFile:filePath, encoding: String.Encoding.utf8)
             source = code
         
         } catch let error as NSError {
@@ -62,29 +64,29 @@ private class PAssertHelper {
     }
     
     // MARK: - remove comments
-    private func removeComment(source: String) -> String {
+    func removeComment(_ source: String) -> String {
         var formatted = ""
         
         let pattern = "[ \t]*//.*"
         let replace = ""
-        formatted = source.stringByReplacingOccurrencesOfString(pattern, withString: replace, options: NSStringCompareOptions.RegularExpressionSearch, range: nil)
+        formatted = source.replacingOccurrences(of: pattern, with: replace, options: NSString.CompareOptions.regularExpression, range: nil)
         
         return formatted
     }
     
     // MARK: - remove multiline comments
-    private func removeMultilinesComment(source: String) -> String {
+    func removeMultilinesComment(_ source: String) -> String {
         var formatted = ""
         
         let pattern = "/\\*.*?\\*/"
         let replace = ""
-        formatted = source.stringByReplacingOccurrencesOfString(pattern, withString: replace, options: NSStringCompareOptions.RegularExpressionSearch, range: nil)
+        formatted = source.replacingOccurrences(of: pattern, with: replace, options: NSString.CompareOptions.regularExpression, range: nil)
         
         return formatted
     }
     
     // MARK: - get literal
-    private func getLiteral(source: String, lineNumber: UInt) -> String {
+    func getLiteral(_ source: String, lineNumber: UInt) -> String {
         var tmpLine = ""
         var literal = ""
         var lineIndex: UInt = 1
@@ -95,7 +97,7 @@ private class PAssertHelper {
             line, stop in
             
             if lineIndex >= lineNumber {
-                tmpLine = line.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                tmpLine = line.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                 
                 for char in tmpLine.characters {
                     if char == "(" {
@@ -117,18 +119,18 @@ private class PAssertHelper {
     }
     
     // MARK: - formatt literal
-    private func formattLiteral(literal: String) -> String {
+    func formattLiteral(_ literal: String) -> String {
         var formatted = ""
         
         let pattern = "(,\\s*)"
         let replace = ", "
-        formatted = literal.stringByReplacingOccurrencesOfString(pattern, withString: replace, options: NSStringCompareOptions.RegularExpressionSearch, range: nil)
+        formatted = literal.replacingOccurrences(of: pattern, with: replace, options: NSString.CompareOptions.regularExpression, range: nil)
         
         return formatted
     }
     
     // MARK: - get line indexes
-    private func getIndexes(literal: String) -> Array<Int> {
+    func getIndexes(_ literal: String) -> Array<Int> {
         var location = 0
         var length = 0
         let pattern = ",(\\s*)[==|!=|>|<|>=|<=|===|!==|~=]+(\\s*),(\\s*)"
@@ -136,10 +138,10 @@ private class PAssertHelper {
         var indexes: Array<Int> = [0, 0, 0]
         
         do {
-            let regexp: NSRegularExpression = try NSRegularExpression(pattern: pattern, options: NSRegularExpressionOptions())
+            let regexp: NSRegularExpression = try NSRegularExpression(pattern: pattern, options: NSRegularExpression.Options())
             
-            regexp.enumerateMatchesInString(literal, options: [], range: NSMakeRange(0, literal.characters.count),
-                usingBlock: {(result: NSTextCheckingResult?, flags: NSMatchingFlags, stop: UnsafeMutablePointer<ObjCBool>) -> Void in
+            regexp.enumerateMatches(in: literal, options: [], range: NSMakeRange(0, literal.characters.count),
+                using: {(result: NSTextCheckingResult?, flags: NSRegularExpression.MatchingFlags, stop: UnsafeMutablePointer<ObjCBool>) -> Void in
                     if let result = result {
                         location = result.range.location
                         length = result.range.length
@@ -158,18 +160,18 @@ private class PAssertHelper {
     }
     
     // MARK: - get file name
-    private func getFilename(filePath: String) -> String {
+    func getFilename(_ filePath: String) -> String {
         var fileName = ""
         
-        if let match = filePath.rangeOfString("[^/]*$", options: .RegularExpressionSearch) {
-            fileName = filePath.substringWithRange(match)
+        if let match = filePath.range(of: "[^/]*$", options: .regularExpression) {
+            fileName = filePath.substring(with: match)
         }
         
         return fileName
     }
     
     // MARK: - repeat character
-    private func repeatCharacter(char: String, length: Int) -> String {
+    func repeatCharacter(_ char: String, length: Int) -> String {
         var chars = ""
         
         if length > 0 {
@@ -182,7 +184,7 @@ private class PAssertHelper {
     }
     
     // MARK: - print result
-    private func output<T>(source source: String?, comparison: Bool, lhs: T, rhs: T, fileName: String, lineNumber: UInt, function: String) -> String {
+    func output<T>(_ source: String?, comparison: Bool, lhs: T, rhs: T, fileName: String, lineNumber: UInt, function: String) -> String {
         
         let title = "=== Assertion Failed ============================================="
         let file = "FILE: \(fileName)"

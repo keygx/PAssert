@@ -6,7 +6,7 @@ Power Assert inspired Test tool for XCTest by Swift
 
 
 ## Requirements
-- Swift 2.2
+- Swift 3.0
 - iOS 8.0 or later
 
 ## Installation
@@ -36,7 +36,7 @@ class PAssertSampleTests: XCTestCase {
     // Test MyCalc add()
     func testCalc() {
         
-        var calc = MyCalc()
+        let calc = MyCalc()
         
         PAssert(calc.add(3, 4), ==, 7)
     }
