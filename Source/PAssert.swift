@@ -164,7 +164,7 @@ private class PAssertHelper {
         var fileName = ""
         
         if let match = filePath.range(of: "[^/]*$", options: .regularExpression) {
-            fileName = filePath.substring(with: match)
+            fileName = String(filePath[match])
         }
         
         return fileName
